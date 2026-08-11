@@ -1,0 +1,47 @@
+# Example of the publish step AmaliScribe's release pipeline adds after its
+# cross-platform build. Rename to publish-release.yml and adapt the build jobs
+# to your actual Electron packaging setup.
+name: Publish release to the download portal
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      # Assumes the Windows/macOS/Linux build jobs have already uploaded their
+      # installers somewhere publicly downloadable — a GitHub release asset, an
+      # S3 bucket, or your own artifact host. The portal stores URLs, not files.
+      - name: Build the release payload
+        env:
+          VERSION: ${{ github.event.release.tag_name }}
+          NOTES: ${{ github.event.release.body }}
+          BASE: ${{ github.event.release.html_url }}/../../download/${{ github.event.release.tag_name }}
+        run: |
+          jq -n \
+            --arg version "${VERSION#v}" \
+            --arg releaseDate "${{ github.event.release.published_at }}" \
+            --arg notes "$NOTES" \
+            --arg windows "$BASE/AmaliScribe-${VERSION#v}-setup.exe" \
+            --arg macos   "$BASE/AmaliScribe-${VERSION#v}.dmg" \
+            --arg linux   "$BASE/AmaliScribe-${VERSION#v}.AppImage" \
+            '{version: $version, releaseDate: $releaseDate, notes: $notes,
+              downloads: {windows: $windows, macos: $macos, linux: $linux}}' \
+            > release.json
+
+      # Omit a platform key entirely if that build did not produce an artifact —
+      # the portal then hides that download button.
+      #
+      # The portal stores this in Turso, so nothing here needs to know where the
+      # app is deployed beyond its public URL.
+      - name: Publish to the release portal
+        env:
+          APP_URL: ${{ vars.RELEASE_PORTAL_URL }}
+          CI_RELEASE_TOKEN: ${{ secrets.CI_RELEASE_TOKEN }}
+        run: |
+          curl --fail-with-body -sS -X POST "$APP_URL/api/releases/latest" \
+            -H "Authorization: Bearer $CI_RELEASE_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d @release.json

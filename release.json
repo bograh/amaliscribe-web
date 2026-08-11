@@ -1,0 +1,10 @@
+{
+  "version": "1.2.3",
+  "releaseDate": "2026-08-11T12:00:00Z",
+  "notes": "Bug fixes and performance improvements.",
+  "downloads": {
+    "windows": "https://example.com/AmaliScribe-1.2.3-setup.exe",
+    "macos": "https://example.com/AmaliScribe-1.2.3.dmg",
+    "linux": "https://example.com/AmaliScribe-1.2.3.AppImage"
+  }
+}
