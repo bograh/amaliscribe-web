@@ -9,17 +9,32 @@ interface DownloadLinkProps {
   version: string
   /** Emphasised variant used for the visitor's detected platform. */
   featured?: boolean
+  /**
+   * `row` is the tall variant used on the latest-release card; `chip` is the
+   * single-line pill used in the release history, where vertical space matters
+   * more than showing the filename inline.
+   */
+  variant?: 'row' | 'chip'
 }
 
-export function DownloadLink({ platform, url, version, featured = false }: DownloadLinkProps) {
+export function DownloadLink({
+  platform,
+  url,
+  version,
+  featured = false,
+  variant = 'row',
+}: DownloadLinkProps) {
   const label = PLATFORM_LABELS[platform]
   const filename = artifactFilename(url)
+  const chip = variant === 'chip'
 
   return (
     <a
-      className={featured ? 'dl dl--featured' : 'dl'}
+      className={['dl', chip && 'dl--chip', featured && 'dl--featured'].filter(Boolean).join(' ')}
       // Spelled out in full because the visible text is deliberately terse.
       aria-label={`Download AmaliScribe ${version} for ${label}${filename ? ` (${filename})` : ''}`}
+      // The chip variant drops the visible filename, so surface it on hover.
+      title={chip ? (filename ?? PLATFORM_ARTIFACT_HINT[platform]) : undefined}
       href={url}
       // Cross-origin artifact host, so the browser drives the download; the
       // attribute is advisory only.
@@ -31,9 +46,9 @@ export function DownloadLink({ platform, url, version, featured = false }: Downl
       </span>
       <span>
         <span className="dl__label">
-          {featured ? `Download for ${label}` : label}
+          {featured && !chip ? `Download for ${label}` : label}
         </span>
-        <span className="dl__file">{filename ?? PLATFORM_ARTIFACT_HINT[platform]}</span>
+        {!chip && <span className="dl__file">{filename ?? PLATFORM_ARTIFACT_HINT[platform]}</span>}
       </span>
       <ArrowDownIcon className="dl__arrow" />
     </a>

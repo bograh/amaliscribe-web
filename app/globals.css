@@ -665,6 +665,41 @@ code {
   color: var(--lime);
 }
 
+/* Inline pill variant: platform name only, filename moves to the tooltip. */
+.picker__list--chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.dl--chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.6rem 0.3rem 0.4rem;
+  border-radius: 999px;
+}
+
+.dl--chip .dl__glyph {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+}
+
+.dl--chip .dl__glyph svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.dl--chip .dl__label {
+  font-size: 0.82rem;
+}
+
+.dl--chip .dl__arrow {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
 /* ================================================================== sections */
 
 .section {
@@ -878,51 +913,77 @@ code {
 
 .history {
   display: grid;
-  gap: 1rem;
+  gap: 0.5rem;
   margin-top: clamp(2rem, 5vw, 3rem);
 }
 
 .release {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
-  gap: clamp(1.1rem, 3vw, 2.25rem);
-  padding: clamp(1.2rem, 2.8vw, 1.75rem);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem clamp(0.9rem, 2.2vw, 1.75rem);
+  padding: 0.7rem clamp(0.85rem, 1.8vw, 1.15rem);
   background: var(--white);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
-  transition: box-shadow 160ms ease;
+  transition:
+    box-shadow 160ms ease,
+    border-color 160ms ease;
 }
 
 .release:hover {
+  border-color: var(--body-dim);
   box-shadow: var(--shadow-card);
-}
-
-@media (max-width: 52rem) {
-  .release {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 .release__head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.4rem 0.9rem;
+  gap: 0.15rem 0.6rem;
+  /* Version and date stay together as the row's anchor. */
+  flex: 0 0 auto;
 }
 
 .release__version {
   font-family: var(--font-mono);
-  font-size: 1.3rem;
+  font-size: 1.05rem;
   letter-spacing: -0.03em;
 }
 
 .release__date {
   color: var(--body-dim);
-  font-size: 0.86rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
 }
 
+/* Takes the slack between the version and the download chips. Clamped to two
+   lines so one verbose changelog entry cannot stretch the whole list. */
 .release__notes {
-  margin-top: 0.75rem;
+  flex: 1 1 12rem;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: 0.88rem;
+  white-space: normal;
+}
+
+.release__downloads {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+@media (max-width: 46rem) {
+  .release__notes {
+    flex-basis: 100%;
+  }
+
+  .release__downloads {
+    margin-left: 0;
+  }
 }
 
 .tag {

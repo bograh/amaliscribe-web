@@ -6,13 +6,20 @@ interface DownloadListProps {
   downloads: Downloads
   /** Platform to promote to the top and render as the featured row. */
   featured?: Platform | null
+  /** `chip` lays the platforms out inline instead of one per line. */
+  variant?: 'row' | 'chip'
 }
 
 /**
- * One row per platform that actually has an artifact. Platforms missing from
+ * One entry per platform that actually has an artifact. Platforms missing from
  * `downloads` are omitted entirely rather than shown disabled.
  */
-export function DownloadList({ version, downloads, featured = null }: DownloadListProps) {
+export function DownloadList({
+  version,
+  downloads,
+  featured = null,
+  variant = 'row',
+}: DownloadListProps) {
   const available = PLATFORMS.filter((platform) => Boolean(downloads[platform]))
   if (available.length === 0) return null
 
@@ -22,7 +29,7 @@ export function DownloadList({ version, downloads, featured = null }: DownloadLi
     : available
 
   return (
-    <ul className="picker__list">
+    <ul className={variant === 'chip' ? 'picker__list picker__list--chips' : 'picker__list'}>
       {ordered.map((platform) => (
         <li key={platform}>
           <DownloadLink
@@ -30,6 +37,7 @@ export function DownloadList({ version, downloads, featured = null }: DownloadLi
             url={downloads[platform] as string}
             version={version}
             featured={platform === promoted}
+            variant={variant}
           />
         </li>
       ))}
