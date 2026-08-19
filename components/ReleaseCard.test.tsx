@@ -90,9 +90,14 @@ describe('ReleaseCard', () => {
     ).toBeInTheDocument()
   })
 
-  it('shows the artifact filename so users know what they are getting', () => {
+  // The compact history row has no space for the filename inline, so it is
+  // carried by the tooltip and the accessible name instead.
+  it('surfaces the artifact filename on the download chip tooltip', () => {
     renderCard()
 
-    expect(screen.getByText('AmaliScribe-1.2.3.dmg')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /for macOS/ })).toHaveAttribute(
+      'title',
+      'AmaliScribe-1.2.3.dmg',
+    )
   })
 })
